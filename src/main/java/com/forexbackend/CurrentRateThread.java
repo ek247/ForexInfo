@@ -64,9 +64,8 @@ public class CurrentRateThread implements Runnable {
                     ArrayList<Float> bid = new ArrayList<Float>();
                     ArrayList<Integer> direction = new ArrayList<Integer>();
 
-                    for (int i = 0; i < 11; i++) {
+                    for (int i = 0; i < 12; i++) {
                         Node node = nList.item(i);
-
                         if (node.getNodeType() == Node.ELEMENT_NODE) {
                             Element element = (Element) node;
                             bid.add(new Float(element.getElementsByTagName("Bid").item(0).getTextContent()));

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html ng-app="forex">
+
+<head>
+<title> Angular app </title>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="Angular/theme.css">
+
+<!-- Latest compiled JavaScript -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-animate.js"></script>
+<script src="Angular/ui-bootstrap-tpls-1.3.3.min.js"></script>
+
+<script type="text/javascript" src="Angular/app.js"></script>
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+</head>
+
+<body>
+<div ng-controller="NavController">
+	<nav class="navbar navbar-default">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">Forex Pricing</a>
+			</div>
+			<ul class="nav navbar-nav">
+				<li><a href="#" ng-click="openAbout()">About</a></li>
+				<li><a href="#" ng-click="openProjects()">Other Projects</a></li> 
+				<li><a href="#" ng-click="openContact()">Contact</a></li> 
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
+				<li><a href="https://www.reddit.com/r/Forex/wiki/index">Forex Tutorial</a></li> 
+			</ul>
+		</div>
+	</nav>
+		
+ <script type="text/ng-template" id="aboutModal.html">
+
+    <!-- Modal content for about section-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" ng-click="closeModal()">&times;</button>
+        <h1 class="modal-title" style="color:#dd3333">About</h1>
+      </div>
+      <div class="modal-body">
+		<p>This is a simple site that gives information about forex prices, both current and historical</p>
+		<p>Each box gives a currency pair, its current ask price, bid price and whether it went up or down.</p>
+		<p>Click on a box to open a graph about the currency pair.</p>      </div>
+      <div class="modal-footer">
+		<h6>Author: Eugene Kennedy</h6>
+      </div>
+    </div>
+  </div>
+</div>
+</script>
+		
+ <script type="text/ng-template" id="projectsModal.html">
+
+    <!-- Modal content for projects section-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" ng-click="closeModal()">&times;</button>
+        <h1 class="modal-title" style="color:#dd3333">Other Projects</h1>
+      </div>
+      <div class="modal-body">
+		<p>I have several other projects (large and small) on my <a href="https://github.com/ek247/">github</a>.</p>
+		<p>If you have any questions or want to know what's in the works, use the contact me tab. </p>
+		</div>
+      <div class="modal-footer">
+		<h6><a href="linkedin.com/in/eugene-kennedy-2a3006b5">LinkedIn</a> if you're interested.</h6>
+      </div>
+    </div>
+  </div>
+</div>
+</script>
+		
+ <script type="text/ng-template" id="contactModal.html">
+
+    <!-- Modal content for contact-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" ng-click="closeModal()">&times;</button>
+        <h1 class="modal-title" style="color:#dd3333">Contact</h1>
+      </div>
+		<form name="contactForm" ng-submit="contactForm.$valid && update(contact)">
+		<div class="modal-body">
+		<p>Name:</p> <input type="text" ng-model="contact.name" /><br />
+		<p>E-mail:</p> <input type="email" ng-model="contact.email" /><br />
+		<p>Message:</p> <textarea rows="4" cols="50" ng-model="contact.message"></textarea>
+		
+		</div>
+      <div class="modal-footer">
+          <button type="submit">Submit</button>
+      </div>
+		</form>
+    </div>
+  </div>
+</div>
+</script>
+</div>
+	
+	
+	
+	<div class = "container" ng-controller="RowController">
+		<div ng-repeat="rate in rates" ng-if="$index % 4 == 0" class="row top_buffer">
+			<div class="col-xs-3">
+			<div class="box">
+				<p ng-class="getDirectionColor(rates[$index].direction)" ng-attr-id="{{rate[$index].name}}">{{rates[$index].name}}</p>
+				Bid: {{rates[$index].bid}}	</br>
+				Ask: {{rates[$index].ask}}	</br>
+				<img ng-src="angular/{{rates[$index].direction}}.png">
+
+			</div>
+			</div>
+			<div class="col-xs-3" ng-if="rates.length > ($index + 1)">
+			<div class="box">
+				<p ng-class="getDirectionColor(rates[$index+1].direction)" ng-attr-id="{{rate[$index+1].name}}">{{rates[$index+1].name}}</p>
+				Bid: {{rates[$index+1].bid}}	</br>
+				Ask: {{rates[$index+1].ask}}	</br>
+				<img ng-src="angular/{{rates[$index+1].direction}}.png">
+
+			</div>
+			</div>
+			<div class="col-xs-3" ng-if="rates.length > ($index + 2)">
+			<div class="box">
+				<p ng-class="getDirectionColor(rates[$index+2].direction)" ng-attr-id="{{rate[$index+2].name}}">{{rates[$index+2].name}}</p>
+				Bid: {{rates[$index+2].bid}}	</br>
+				Ask: {{rates[$index+2].ask}}	</br>
+				<img ng-src="angular/{{rates[$index+2].direction}}.png">
+			</div>
+			</div>
+			<div class="col-xs-3" ng-if="rates.length > ($index + 3)" ng-attr-id="{{rate[$index+3].name}}">
+			<div class="box">
+				<p ng-class="getDirectionColor(rates[$index+3].direction)">{{rates[$index+3].name}}</p>
+				Bid: {{rates[$index+3].bid}}	</br>
+				Ask: {{rates[$index+3].ask}}	</br>
+				<img ng-src="angular/{{rates[$index+3].direction}}.png">
+
+			</div>
+			</div>
+		
+		</div>
+		
+	</div>
+	
+	
+
+
+</body>
+
+
+</html>

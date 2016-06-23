@@ -71,6 +71,11 @@ public class CurrentRates{
         EURGBPAsk = ask.get(10);
         EURGBPBid = bid.get(10);
         EURGBPDirection = direction.get(10);
+
+        CHFJPYAsk = ask.get(11);
+        CHFJPYBid = bid.get(11);
+        CHFJPYDirection = direction.get(11);
+
     }
 
     @Column(name = "DatePosted")
@@ -174,6 +179,17 @@ public class CurrentRates{
 
     @Column(name = "EURGBPDirection")
     private float EURGBPDirection;
+
+    @Column(name = "CHFJPYBid")
+    private float CHFJPYBid;
+
+    @Column(name = "CHFJPYAsk")
+    private float CHFJPYAsk;
+
+    @Column(name = "CHFJPYDirection")
+    private float CHFJPYDirection;
+
+
 
     public int getId() {
         return id;
@@ -454,6 +470,31 @@ public class CurrentRates{
     public void setEURGBPDirection(float EURGBPDirection) {
         this.EURGBPDirection = EURGBPDirection;
     }
+
+    public float getCHFJPYBid() {
+        return CHFJPYBid;
+    }
+
+    public void setCHFJPYBid(float CHFJPYBid) {
+        this.CHFJPYBid = CHFJPYBid;
+    }
+
+    public float getCHFJPYAsk() {
+        return CHFJPYAsk;
+    }
+
+    public void setCHFJPYAsk(float CHFJPYAsk) {
+        this.CHFJPYAsk = CHFJPYAsk;
+    }
+
+    public float getCHFJPYDirection() {
+        return CHFJPYDirection;
+    }
+
+    public void setCHFJPYDirection(float CHFJPYDirection) {
+        this.CHFJPYDirection = CHFJPYDirection;
+    }
+
 
 
     @Override
