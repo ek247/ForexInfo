@@ -1,0 +1,18 @@
+.top_buffer
+{
+	margin-top: 20px;
+}
+
+.box
+{
+	background-color: #e4e4e4;
+	width: 50%;
+	text-align: center;
+	border-radius: 5px; 
+}
+
+.box img
+{
+	width: 25px;
+	height: 25px;
+}
