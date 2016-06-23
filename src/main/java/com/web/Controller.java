@@ -1,9 +1,6 @@
 package com.web;
 
-import com.forexbackend.CurrentRateRepository;
-import com.forexbackend.CurrentRates;
-import com.forexbackend.Message;
-import com.forexbackend.MessageRepository;
+import com.forexbackend.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -13,10 +10,7 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
 *   RESTful controller that sends the current rate and historical forex rates to those who ask
@@ -44,13 +38,14 @@ public class Controller {
 
 
     //Returns a list of historical rates from given date to current at every given amount of minutes.
-    @RequestMapping("/HistoricalRates/{date}/{type}/{granularity}")
-    public List<CurrentRates> getRates(@PathVariable String date, @PathVariable String type, @PathVariable final int granularity)//Granularity is in units of time.
+    @RequestMapping("/HistoricalRates/{date}/{rate}/{type}/{granularity}")
+    public List<Rates> getRates(@PathVariable String date, @PathVariable String rate, @PathVariable String type, @PathVariable final int granularity)//Granularity is in units of time.
     {
         java.sql.Timestamp time = java.sql.Timestamp.valueOf(date+" "+"00:00:00");
 
         ArrayList<CurrentRates> toRet = new ArrayList(repo.findHistorical(time));
         ArrayList<CurrentRates> toRemove = new ArrayList<CurrentRates>();
+        ArrayList<Rates> rates = new ArrayList<>();
 
 
         int timeFrame = -1;
@@ -69,7 +64,7 @@ public class Controller {
                 timeFrame = Calendar.YEAR;
                 break;
             default:
-                return toRemove; //If not valid input return empty list
+                return rates; //If not valid input return empty list
         }
 
         for(int i = 0; i < toRet.size(); i++)
@@ -82,7 +77,63 @@ public class Controller {
 
         toRet.removeAll(toRemove);
 
-        return toRet;
+        for(CurrentRates r : toRet)
+        {
+            Rates tmp = new Rates();
+            tmp.setName(rate);
+            switch (rate)
+            {
+                case("EURUSD"):
+                    tmp.setAsk(r.getEURUSDAsk());
+                    tmp.setBid(r.getEURUSDBid());
+                    break;
+                case("USDJPY"):
+                    tmp.setAsk(r.getUSDJPYAsk());
+                    tmp.setBid(r.getUSDJPYBid());
+                    break;
+                case("GBPUSD"):
+                tmp.setAsk(r.getGBPUSDAsk());
+                tmp.setBid(r.getGBPUSDBid());
+                break;
+                case("USDCHF"):
+                    tmp.setAsk(r.getUSDCHFAsk());
+                    tmp.setBid(r.getUSDCHFBid());
+                    break;
+                case("EURCHF"):
+                    tmp.setAsk(r.getEURCHFAsk());
+                    tmp.setBid(r.getEURCHFBid());
+                    break;
+                case("AUDUSD"):
+                    tmp.setAsk(r.getAUDUSDAsk());
+                    tmp.setBid(r.getAUDUSDBid());
+                    break;
+                case("USDCAD"):
+                    tmp.setAsk(r.getUSDCADAsk());
+                    tmp.setBid(r.getUSDCADBid());
+                    break;
+                case("NZDUSD"):
+                    tmp.setAsk(r.getNZDUSDAsk());
+                    tmp.setBid(r.getNZDUSDBid());
+                    break;
+                case("EURJPY"):
+                    tmp.setAsk(r.getEURJPYAsk());
+                    tmp.setBid(r.getEURJPYBid());
+                    break;
+                case("GBPJPY"):
+                    tmp.setAsk(r.getGBPJPYAsk());
+                    tmp.setBid(r.getGBPJPYBid());
+                    break;
+                case("EURGBP"):
+                    tmp.setAsk(r.getEURGBPAsk());
+                    tmp.setBid(r.getEURGBPBid());
+                    break;
+            }
+
+            tmp.setTime(new Date(r.getDate().getTime()));
+            rates.add(tmp);
+        }
+
+        return rates;
     }
 
     @ResponseStatus(value = HttpStatus.OK)

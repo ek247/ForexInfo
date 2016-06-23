@@ -16,7 +16,6 @@
 
 <script type="text/javascript" src="Angular/app.js"></script>
 
-
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
@@ -110,8 +109,8 @@
 	<div class = "container" ng-controller="RowController">
 		<div ng-repeat="rate in rates" ng-if="$index % 4 == 0" class="row top_buffer">
 			<div class="col-xs-3">
-			<div class="box">
-				<p ng-class="getDirectionColor(rates[$index].direction)" ng-attr-id="{{rate[$index].name}}">{{rates[$index].name}}</p>
+			<div class="box" ng-click="showChart(rate[$index].name)">
+				<p ng-class="getDirectionColor(rates[$index].direction)">{{rates[$index].name}}</p>
 				Bid: {{rates[$index].bid}}	</br>
 				Ask: {{rates[$index].ask}}	</br>
 				<img ng-src="angular/{{rates[$index].direction}}.png">
@@ -119,8 +118,8 @@
 			</div>
 			</div>
 			<div class="col-xs-3" ng-if="rates.length > ($index + 1)">
-			<div class="box">
-				<p ng-class="getDirectionColor(rates[$index+1].direction)" ng-attr-id="{{rate[$index+1].name}}">{{rates[$index+1].name}}</p>
+			<div class="box" ng-click="showChart(rate[$index+1].name)">
+				<p ng-class="getDirectionColor(rates[$index+1].direction)">{{rates[$index+1].name}}</p>
 				Bid: {{rates[$index+1].bid}}	</br>
 				Ask: {{rates[$index+1].ask}}	</br>
 				<img ng-src="angular/{{rates[$index+1].direction}}.png">
@@ -128,15 +127,15 @@
 			</div>
 			</div>
 			<div class="col-xs-3" ng-if="rates.length > ($index + 2)">
-			<div class="box">
-				<p ng-class="getDirectionColor(rates[$index+2].direction)" ng-attr-id="{{rate[$index+2].name}}">{{rates[$index+2].name}}</p>
+			<div class="box" ng-click="showChart(rate[$index+2].name)">
+				<p ng-class="getDirectionColor(rates[$index+2].direction)">{{rates[$index+2].name}}</p>
 				Bid: {{rates[$index+2].bid}}	</br>
 				Ask: {{rates[$index+2].ask}}	</br>
 				<img ng-src="angular/{{rates[$index+2].direction}}.png">
 			</div>
 			</div>
-			<div class="col-xs-3" ng-if="rates.length > ($index + 3)" ng-attr-id="{{rate[$index+3].name}}">
-			<div class="box">
+			<div class="col-xs-3" ng-if="rates.length > ($index + 3)">
+			<div class="box" ng-click="showChart(rate[$index+3].name)">
 				<p ng-class="getDirectionColor(rates[$index+3].direction)">{{rates[$index+3].name}}</p>
 				Bid: {{rates[$index+3].bid}}	</br>
 				Ask: {{rates[$index+3].ask}}	</br>
@@ -144,14 +143,32 @@
 
 			</div>
 			</div>
-		
-		</div>
-		
-	</div>
-	
-	
 
 
+        </div>
+
+
+        <div class="container" ng-controller="LineCtrl" ng-show="graphReady">
+            <div class = "row top_buffer">
+                <div class="col-md-12">
+                    <canvas id="line" class="chart chart-line" chart-data="data"
+                            chart-labels="labels" chart-series="series" chart-options="options"
+                            chart-dataset-override="datasetOverride" chart-click="onClick">
+                    </canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.1.1/Chart.js"></script>
+<script src="https://cdn.jsdelivr.net/angular.chartjs/latest/angular-chart.min.js"></script>
+<link rel=stylesheet href="https://cdn.jsdelivr.net/angular.chartjs/latest/angular-chart.css">
 </body>
 
 
