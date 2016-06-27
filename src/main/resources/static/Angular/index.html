@@ -50,8 +50,9 @@
       <div class="modal-body">
 		<p>This is a simple site that gives information about forex prices, both current and historical</p>
 		<p>Each box gives a currency pair, its current ask price, bid price and whether it went up or down.</p>
-		<p>Click on a box to open a graph about the currency pair.</p>      </div>
-      <div class="modal-footer">
+		<p>Click on a box to open a graph about the currency pair. If the dates shown in the graph do not extend to the time period selected, it means the site has not collected enough data to populate the graph.</p>      </div>
+        <p>The volatility indicatior is the standard deviation from the start of the graph's time period until the point. As such there is no point at the first spot.</p>
+        <div class="modal-footer">
 		<h6>Author: Eugene Kennedy</h6>
       </div>
     </div>
@@ -151,6 +152,7 @@
         <div class="container" ng-controller="LineCtrl" ng-show="graphReady">
             <div class = "row top_buffer">
                 <div class="col-md-8">
+						<p style="text-align: center;">{{chartName}}</p> </br>
                     <canvas id="line" class="chart chart-line" chart-data="data"
                             chart-labels="labels" chart-series="series" chart-options="options"
                             chart-dataset-override="datasetOverride" chart-click="onClick">
@@ -177,7 +179,7 @@
 							</tr>
 							<tr>
 								<td ng-click="setTime(7, 'day')">1 Week</td>
-								<td ng-click="toggleVolatility">Volatility</td>
+								<td ng-click="toggleVolatility()">Volatility</td>
 							</tr>
 							<tr><td ng-click="setTime(1, 'month')">1 Month</td>
 								</tr><td ng-click="setTime(6, 'month')">6 Months</td>

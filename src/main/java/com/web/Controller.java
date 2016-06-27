@@ -146,6 +146,10 @@ public class Controller {
                     tmp.setAsk(r.getEURGBPAsk());
                     tmp.setBid(r.getEURGBPBid());
                     break;
+                case("CHFJPY"):
+                    tmp.setAsk(r.getCHFJPYAsk());
+                    tmp.setBid(r.getCHFJPYBid());
+                    break;
             }
 
             tmp.setTime(new Date(r.getDate().getTime()));

@@ -58,13 +58,27 @@ myApp.controller('RowController', ['$scope', '$http', '$interval', function($sco
             show: false, name: ""
         };
     
+        $scope.chartChanged = false;
+        $scope.getAsk = true;
+        $scope.getBid = true;
+        $scope.vol = false;
 
         setRates($scope, $http);
 
 		$interval(function () {
 			setRates($scope, $http);
-		}, 30000); //Update every 30 seconds to lower delay since current rates is only updated minutely
-		
+            $scope.chartChanged = true;
+        }, 30000); //Update every 30 seconds to lower delay since current rates is only updated minutely
+
+    $scope.toggleAsk = function () {
+        $scope.getAsk = !$scope.getAsk;
+        $scope.chartChanged = true;
+    };
+
+    $scope.toggleBid = function () {
+        $scope.getBid = !$scope.getBid;
+        $scope.chartChanged = true;
+    };
     $scope.showChart = function (name) {
         $scope.graphReady = true;
         $scope.chartName = name;
@@ -74,29 +88,7 @@ myApp.controller('RowController', ['$scope', '$http', '$interval', function($sco
         var year = currentDate.getFullYear();
         $scope.dateStart = year+'-'+month+'-'+day;
         $scope.timeRange = 'minute';
-        $http({
-            method: 'GET',
-            url: 'http://localhost/HistoricalRates/'+year+'-'+month+'-'+day+'/' + $scope.chartName + '/minute'
-        }).then(function successCallback(response) {
-            var tmpData = [];
-            var tmpLabels = [];
-            for (var i = 0; i < 2; i++) {
-                tmpData[i] = [];
-            }
-
-
-            for (i = 0; i < response.data.length; i++) {
-                var ask = response.data[i].ask;
-                tmpData[0][i] = (ask);
-                tmpData[1][i] = (response.data[i].bid);
-                var d = new Date(0); // The 0 there is the key, which sets the date to the epoch
-                d.setUTCMilliseconds(response.data[i].time);
-                tmpLabels.push(d.toLocaleString());
-            }
-
-            $scope.data = tmpData;
-            $scope.labels = tmpLabels;
-        });
+        $scope.chartChanged = true;
     };
 
     $scope.setTime = function(number, time){
@@ -110,45 +102,21 @@ myApp.controller('RowController', ['$scope', '$http', '$interval', function($sco
             $scope.timeRange = "hour";
         }
         else if(time === "year") {
-            currentDate.setYear(currentDate.getYear() - number);
+            currentDate.setFullYear(currentDate.getFullYear() - number);
             $scope.timeRange = "day";
         }
         var day = currentDate.getDate();
         var month = currentDate.getMonth() + 1;
         var year = currentDate.getFullYear();
         $scope.dateStart = year+'-'+month+'-'+day;
+        $scope.chartChanged = true;
+    };
 
-        $http({
-                method: 'GET',
-                url: 'http://localhost/HistoricalRates/'+$scope.dateStart+'/' + $scope.chartName + '/'+$scope.timeRange
-            }).then(function successCallback(response) {
-                var tmpData = [];
-                var tmpLabels = [];
-
-                for (var i = 0; i < 2; i++) {
-                    tmpData[i] = [];
-                }
-
-
-                for (i = 0; i < response.data.length; i++) {
-                    var ask = response.data[i].ask;
-                    tmpData[0][i] = (ask);
-                    tmpData[1][i] = (response.data[i].bid);
-                    var d = new Date(0); // The 0 there is the key, which sets the date to the epoch
-                    d.setUTCMilliseconds(response.data[i].time);
-                    tmpLabels.push(d.toLocaleString());
-                }
-
-            
-                $scope.data = tmpData;
-                $scope.labels = tmpLabels;
-            });
-
-    }
+    $scope.toggleVolatility = function()
     {
-        $scope.chartName
-    }
-
+        $scope.vol = !$scope.vol;
+        $scope.chartChanged = true;
+    };
     
   $scope.getDirectionColor = function(direction){
     if(direction == 1)
@@ -216,7 +184,6 @@ angular.module('forex').controller('ModalInstanceCtrl', function ($scope, $uibMo
 myApp.controller("LineCtrl", function ($scope, $http, $interval) {
 
 
-    $scope.series = ['Ask', 'Bid'];
 
     $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }, { yAxisID: 'y-axis-2' }];
     $scope.options = {
@@ -240,18 +207,23 @@ myApp.controller("LineCtrl", function ($scope, $http, $interval) {
     };
 
         $interval(function () {
-            if($scope.graphReady) {
+            if($scope.graphReady && $scope.$parent.chartChanged) {
                 $http({
                     method: 'GET',
                     url: 'http://localhost/HistoricalRates/'+$scope.dateStart+'/' + $scope.chartName + '/'+$scope.timeRange
                 }).then(function successCallback(response) {
+                    $scope.series = [];
+                    if($scope.$parent.getAsk)
+                        $scope.series.push('Ask');
+                    else if($scope.$parent.getAsk)
+                        $scope.series.push('Bid');
+
                     var tmpData = [];
                     var tmpLabels = [];
 
                     for (var i = 0; i < 2; i++) {
                         tmpData[i] = [];
                     }
-
 
                     for (i = 0; i < response.data.length; i++) {
                         var ask = response.data[i].ask;
@@ -261,14 +233,61 @@ myApp.controller("LineCtrl", function ($scope, $http, $interval) {
                         d.setUTCMilliseconds(response.data[i].time);
                         tmpLabels.push(d.toLocaleString());
                     }
-
-                    $scope.data = tmpData;
-                    $scope.labels = tmpLabels;
+                    if($scope.vol != true) {
+                        var index = 0;
+                        $scope.data = [];
+                        if($scope.$parent.getAsk) {
+                            $scope.data.push(tmpData[index]);
+                            index += 1;
+                        }
+                        if($scope.$parent.getBid) {
+                            $scope.data.push(tmpData[index]);
+                        }
+                        $scope.labels = tmpLabels;
+                    }
+                    else
+                    {
+                        $scope.data = [];
+                        var index = 0;
+                        if($scope.$parent.getAsk) {
+                            $scope.data.push(stdDev(tmpData[index].length, tmpData[index]));
+                            index += 1;
+                        }
+                        if($scope.$parent.getBid) {
+                            $scope.data.push(stdDev(tmpData[index].length, tmpData[index]));
+                        }
+                        $scope.labels = tmpLabels;
+                    }
+                    $scope.$parent.chartChanged = false;
                 });
             }
-        }, 60000);
+        }, 500);
 
 });
 
+function stdDev(index, data)
+{
+    var avg = 0;
+    for(var i = 0; i < index; i++)
+    {
+        avg += data[i];
+    }
+    avg = avg/index;
+
+    var stddev = [];
+    stddev.push(null);
+    for(i = 1; i < index; i++)
+    {
+        var tmp = 0;
+        for(var j = 0; j < i; j++)
+        {
+            tmp += Math.pow((avg - data[j]), 2);
+        }
+        stddev.push(Math.sqrt(tmp/i));
+    }
+
+
+    return stddev;
+}
 
 
