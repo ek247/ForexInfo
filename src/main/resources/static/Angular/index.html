@@ -109,7 +109,7 @@
 	<div class = "container" ng-controller="RowController">
 		<div ng-repeat="rate in rates" ng-if="$index % 4 == 0" class="row top_buffer">
 			<div class="col-xs-3">
-			<div class="box" ng-click="showChart(rate[$index].name)">
+			<div class="box" ng-click="showChart(rates[$index].name)">
 				<p ng-class="getDirectionColor(rates[$index].direction)">{{rates[$index].name}}</p>
 				Bid: {{rates[$index].bid}}	</br>
 				Ask: {{rates[$index].ask}}	</br>
@@ -118,7 +118,7 @@
 			</div>
 			</div>
 			<div class="col-xs-3" ng-if="rates.length > ($index + 1)">
-			<div class="box" ng-click="showChart(rate[$index+1].name)">
+			<div class="box" ng-click="showChart(rates[$index+1].name)">
 				<p ng-class="getDirectionColor(rates[$index+1].direction)">{{rates[$index+1].name}}</p>
 				Bid: {{rates[$index+1].bid}}	</br>
 				Ask: {{rates[$index+1].ask}}	</br>
@@ -127,7 +127,7 @@
 			</div>
 			</div>
 			<div class="col-xs-3" ng-if="rates.length > ($index + 2)">
-			<div class="box" ng-click="showChart(rate[$index+2].name)">
+			<div class="box" ng-click="showChart(rates[$index+2].name)">
 				<p ng-class="getDirectionColor(rates[$index+2].direction)">{{rates[$index+2].name}}</p>
 				Bid: {{rates[$index+2].bid}}	</br>
 				Ask: {{rates[$index+2].ask}}	</br>
@@ -135,7 +135,7 @@
 			</div>
 			</div>
 			<div class="col-xs-3" ng-if="rates.length > ($index + 3)">
-			<div class="box" ng-click="showChart(rate[$index+3].name)">
+			<div class="box" ng-click="showChart(rates[$index+3].name)">
 				<p ng-class="getDirectionColor(rates[$index+3].direction)">{{rates[$index+3].name}}</p>
 				Bid: {{rates[$index+3].bid}}	</br>
 				Ask: {{rates[$index+3].ask}}	</br>
@@ -150,12 +150,43 @@
 
         <div class="container" ng-controller="LineCtrl" ng-show="graphReady">
             <div class = "row top_buffer">
-                <div class="col-md-12">
+                <div class="col-md-8">
                     <canvas id="line" class="chart chart-line" chart-data="data"
                             chart-labels="labels" chart-series="series" chart-options="options"
                             chart-dataset-override="datasetOverride" chart-click="onClick">
                     </canvas>
                 </div>
+				<div class="col-md-4">
+					<div class="menu">
+						<table>
+							<thead>
+							<tr>
+								<th>Time Period </th>
+								<th> Data points</th>
+							</tr>
+							</thead>
+							<tbody>
+							<tr>
+								<td ng-click="setTime(1, 'day')">1 Day</td>
+								<td ng-click="toggleAsk()">Ask</td>
+							</tr>
+							<tr>
+								<td ng-click="setTime(5, 'day')">5 Day</td>
+								<td ng-click="toggleBid()">Bid</td>
+
+							</tr>
+							<tr>
+								<td ng-click="setTime(7, 'day')">1 Week</td>
+								<td ng-click="toggleVolatility">Volatility</td>
+							</tr>
+							<tr><td ng-click="setTime(1, 'month')">1 Month</td>
+								</tr><td ng-click="setTime(6, 'month')">6 Months</td>
+								<tr><td ng-click="setTime(1, 'year')">1 Year</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
             </div>
         </div>
 

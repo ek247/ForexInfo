@@ -16,7 +16,7 @@ public interface CurrentRateRepository extends CrudRepository<CurrentRates, Inte
     @Query("SELECT p FROM CurrentRates p WHERE p.id=("+ "SELECT max(p.id) FROM p" + ")")
     public CurrentRates findCurrent();
 
-    //Custom query to get rates from date (starting from 00:00:00) to most recent
+    //Custom query to get rates from date (starting from 00:00:00)
     @Query("SELECT p FROM CurrentRates p WHERE p.date>= :date")
     public List<CurrentRates> findHistorical(@Param("date") Timestamp date);
 

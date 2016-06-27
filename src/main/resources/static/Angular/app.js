@@ -66,10 +66,90 @@ myApp.controller('RowController', ['$scope', '$http', '$interval', function($sco
 		}, 30000); //Update every 30 seconds to lower delay since current rates is only updated minutely
 		
     $scope.showChart = function (name) {
-        chart.show = true;
-        chart.name = name;
+        $scope.graphReady = true;
+        $scope.chartName = name;
+        var currentDate = new Date();
+        var day = currentDate.getDate();
+        var month = currentDate.getMonth() + 1;
+        var year = currentDate.getFullYear();
+        $scope.dateStart = year+'-'+month+'-'+day;
+        $scope.timeRange = 'minute';
+        $http({
+            method: 'GET',
+            url: 'http://localhost/HistoricalRates/'+year+'-'+month+'-'+day+'/' + $scope.chartName + '/minute'
+        }).then(function successCallback(response) {
+            var tmpData = [];
+            var tmpLabels = [];
+            for (var i = 0; i < 2; i++) {
+                tmpData[i] = [];
+            }
+
+
+            for (i = 0; i < response.data.length; i++) {
+                var ask = response.data[i].ask;
+                tmpData[0][i] = (ask);
+                tmpData[1][i] = (response.data[i].bid);
+                var d = new Date(0); // The 0 there is the key, which sets the date to the epoch
+                d.setUTCMilliseconds(response.data[i].time);
+                tmpLabels.push(d.toLocaleString());
+            }
+
+            $scope.data = tmpData;
+            $scope.labels = tmpLabels;
+        });
     };
- 
+
+    $scope.setTime = function(number, time){
+        var currentDate = new Date();
+        if(time === "day") {
+            currentDate.setDate(currentDate.getDate() - number);
+            $scope.timeRange = "minute";
+        }
+        else if(time === "month") {
+            currentDate.setMonth(currentDate.getMonth() - number);
+            $scope.timeRange = "hour";
+        }
+        else if(time === "year") {
+            currentDate.setYear(currentDate.getYear() - number);
+            $scope.timeRange = "day";
+        }
+        var day = currentDate.getDate();
+        var month = currentDate.getMonth() + 1;
+        var year = currentDate.getFullYear();
+        $scope.dateStart = year+'-'+month+'-'+day;
+
+        $http({
+                method: 'GET',
+                url: 'http://localhost/HistoricalRates/'+$scope.dateStart+'/' + $scope.chartName + '/'+$scope.timeRange
+            }).then(function successCallback(response) {
+                var tmpData = [];
+                var tmpLabels = [];
+
+                for (var i = 0; i < 2; i++) {
+                    tmpData[i] = [];
+                }
+
+
+                for (i = 0; i < response.data.length; i++) {
+                    var ask = response.data[i].ask;
+                    tmpData[0][i] = (ask);
+                    tmpData[1][i] = (response.data[i].bid);
+                    var d = new Date(0); // The 0 there is the key, which sets the date to the epoch
+                    d.setUTCMilliseconds(response.data[i].time);
+                    tmpLabels.push(d.toLocaleString());
+                }
+
+            
+                $scope.data = tmpData;
+                $scope.labels = tmpLabels;
+            });
+
+    }
+    {
+        $scope.chartName
+    }
+
+    
   $scope.getDirectionColor = function(direction){
     if(direction == 1)
 	{
@@ -81,6 +161,7 @@ myApp.controller('RowController', ['$scope', '$http', '$interval', function($sco
 	}
 	return "bg-warning";
 }
+
 }]);
 
 function setRates($scope, $http)
@@ -107,7 +188,6 @@ function setRates($scope, $http)
             varRates = $scope.rates;
 		
 		}, function errorCallback(response) {
-			alert("failed");
 			$scope.rates = varRates;
   });
 }
@@ -135,49 +215,8 @@ angular.module('forex').controller('ModalInstanceCtrl', function ($scope, $uibMo
 
 myApp.controller("LineCtrl", function ($scope, $http, $interval) {
 
-    $scope.data = [];
-    $scope.graphReady = false;
-    $scope.labels = [];
 
-    for (var i=0;i<2;i++) {
-        $scope.data[i] = [];
-    }
-
-    $http({
-        method: 'GET',
-        url: 'http://localhost/HistoricalRates/2016-06-23/EURUSD/minute/1'
-    }).then(function successCallback(response) {
-        var tmpData = [];
-        var tmpLabels = [];
-
-        for (var i=0;i<2;i++) {
-            tmpData[i] = [];
-        }
-
-        console.log(tmpData.length);
-        console.log(tmpData[0]);
-
-        for(i = 0; i < response.data.length; i++)
-        {
-            var ask = response.data[i].ask;
-            tmpData[0][i]=(ask);
-            tmpData[1][i]=(response.data[i].bid);
-            var d = new Date(0); // The 0 there is the key, which sets the date to the epoch
-            d.setUTCMilliseconds(response.data[i].time);
-            tmpLabels.push(d.toUTCString());
-        }
-
-        $scope.labels = tmpLabels;
-        $scope.data = tmpData;
-        $scope.graphReady = true;
-
-
-
-        $scope.series = ['Ask', 'Bid'];
-
-    $scope.onClick = function (points, evt) {
-        console.log(points, evt);
-    };
+    $scope.series = ['Ask', 'Bid'];
 
     $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }, { yAxisID: 'y-axis-2' }];
     $scope.options = {
@@ -200,8 +239,36 @@ myApp.controller("LineCtrl", function ($scope, $http, $interval) {
 
     };
 
+        $interval(function () {
+            if($scope.graphReady) {
+                $http({
+                    method: 'GET',
+                    url: 'http://localhost/HistoricalRates/'+$scope.dateStart+'/' + $scope.chartName + '/'+$scope.timeRange
+                }).then(function successCallback(response) {
+                    var tmpData = [];
+                    var tmpLabels = [];
+
+                    for (var i = 0; i < 2; i++) {
+                        tmpData[i] = [];
+                    }
+
+
+                    for (i = 0; i < response.data.length; i++) {
+                        var ask = response.data[i].ask;
+                        tmpData[0][i] = (ask);
+                        tmpData[1][i] = (response.data[i].bid);
+                        var d = new Date(0); // The 0 there is the key, which sets the date to the epoch
+                        d.setUTCMilliseconds(response.data[i].time);
+                        tmpLabels.push(d.toLocaleString());
+                    }
+
+                    $scope.data = tmpData;
+                    $scope.labels = tmpLabels;
+                });
+            }
+        }, 60000);
 
 });
 
-});
+
 

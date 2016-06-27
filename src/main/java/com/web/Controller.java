@@ -38,14 +38,18 @@ public class Controller {
 
 
     //Returns a list of historical rates from given date to current at every given amount of minutes.
-    @RequestMapping("/HistoricalRates/{date}/{rate}/{type}/{granularity}")
-    public List<Rates> getRates(@PathVariable String date, @PathVariable String rate, @PathVariable String type, @PathVariable final int granularity)//Granularity is in units of time.
+    @RequestMapping("/HistoricalRates/{date}/{rate}/{type}")
+    public List<Rates> getRates(@PathVariable String date, @PathVariable String rate, @PathVariable String type)
     {
         java.sql.Timestamp time = java.sql.Timestamp.valueOf(date+" "+"00:00:00");
 
+        System.out.println("Asked for: " + rate + " from " + time.toString() + " given every " + type);
+
         ArrayList<CurrentRates> toRet = new ArrayList(repo.findHistorical(time));
-        ArrayList<CurrentRates> toRemove = new ArrayList<CurrentRates>();
+
+        ArrayList<CurrentRates> toUse = new ArrayList<CurrentRates>();
         ArrayList<Rates> rates = new ArrayList<>();
+
 
 
         int timeFrame = -1;
@@ -67,17 +71,32 @@ public class Controller {
                 return rates; //If not valid input return empty list
         }
 
-        for(int i = 0; i < toRet.size(); i++)
-        {
-            Calendar tmp = Calendar.getInstance();
-            tmp.setTimeInMillis(toRet.get(i).getDate().getTime());
-            if(tmp.get(timeFrame)%granularity != 0)
-                toRemove.add(toRet.get(i));
+        //Get correct dates/granulatiry
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(time.getTime());
+        Calendar cal2 = Calendar.getInstance();
+
+        while(cal.before(Calendar.getInstance())) {
+            boolean found = false;
+            for (int i = 0; i < toRet.size(); i++) {
+                cal2.setTimeInMillis(toRet.get(i).getDate().getTime());
+                if(cal.get(Calendar.YEAR)==cal2.get(Calendar.YEAR) && cal.get(Calendar.DAY_OF_YEAR)==cal2.get(Calendar.DAY_OF_YEAR) && cal.get(Calendar.HOUR_OF_DAY)==cal2.get(Calendar.HOUR_OF_DAY) && cal.get(Calendar.MINUTE)==cal2.get(Calendar.MINUTE))
+                {
+                    toUse.add(toRet.get(i));
+                    found = true;
+                    break;
+                }
+            }
+            if(found)
+                cal.add(timeFrame, 1);
+            else
+                cal.add(Calendar.MINUTE, 1);
         }
 
-        toRet.removeAll(toRemove);
 
-        for(CurrentRates r : toRet)
+        //Convert to one currecy pair
+        for(CurrentRates r : toUse)
         {
             Rates tmp = new Rates();
             tmp.setName(rate);
